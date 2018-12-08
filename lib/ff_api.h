@@ -44,7 +44,7 @@ struct linux_sockaddr {
     char sa_data[14];
 };
 
-typedef int (*loop_func_t)(void *arg);
+typedef int (*loop_func_t)(uint64_t cur_tsc,void *arg);
 
 int ff_init(int argc, char * const argv[]);
 

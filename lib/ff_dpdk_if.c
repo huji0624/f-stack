@@ -1530,7 +1530,7 @@ main_loop(void *arg)
 
         if (likely(lr->loop != NULL && (!idle || cur_tsc - usch_tsc > drain_tsc))) {
             usch_tsc = cur_tsc;
-            lr->loop(lr->arg);
+            lr->loop(cur_tsc,lr->arg);
         }
 
         idle_sleep_tsc = rte_rdtsc();
