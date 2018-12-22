@@ -605,7 +605,7 @@ calc_latency(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
     latency_numbers.total_cycles += (now - latency_numbers.g_pkt_timestamp);
     latency_numbers.total_pkts   += 1;
 
-    if (latency_numbers.total_pkts > (100 * 1000 * 1000ULL)) {
+    if (latency_numbers.total_pkts > (1000 * 1000ULL)) {
         printf("Latency = %"PRIu64" cycles\n",
                latency_numbers.total_cycles / latency_numbers.total_pkts);
 
@@ -621,7 +621,9 @@ add_timestamps(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
 {
     latency_numbers.g_pkt_timestamp = rte_rdtsc();
 
-    printf("rx nb_pkts %u\n",nb_pkts);
+    if(nb_pkts>0){
+        printf("rx nb_pkts %u\n",nb_pkts);
+    }
 
     return nb_pkts;
 }
