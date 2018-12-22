@@ -606,8 +606,9 @@ calc_latency(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
     latency_numbers.total_pkts   += 1;
 
     if (latency_numbers.total_pkts > (1000 * 1000ULL)) {
-        printf("Latency = %"PRIu64" cycles\n",
-               latency_numbers.total_cycles / latency_numbers.total_pkts);
+        uint64_t hz = rte_get_tsc_hz();
+        uint64_t perhz = latency_numbers.total_cycles / latency_numbers.total_pkts;
+        printf("Latency = %"PRIu64" cycles.  %"PRIu64" ns.\n",perhz,1000*1000*1000*perhz/hz);
 
         latency_numbers.total_cycles = latency_numbers.total_pkts = 0;
     }
@@ -830,7 +831,7 @@ init_port_start(void)
         }
 
         if(ff_global_cfg.dpdk.cal_latency){
-            printf("add latency bench.\n");
+            printf("add latency bench.%lu\n",rte_get_tsc_hz());
             /* Add the callbacks for RX and TX.*/
             rte_eth_add_rx_callback(port_id, 0, add_timestamps, NULL);
             rte_eth_add_tx_callback(port_id, 0, calc_latency, NULL);
