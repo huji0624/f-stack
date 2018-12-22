@@ -584,6 +584,51 @@ set_rss_table(uint16_t port_id, uint16_t reta_size, uint16_t nb_queues)
     }
 }
 
+/*
+ * ==========latency
+ * */
+
+static struct {
+    uint64_t total_cycles;
+    uint64_t total_pkts;
+    uint64_t g_pkt_timestamp;
+} latency_numbers;
+
+static uint16_t
+calc_latency(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
+             struct rte_mbuf **pkts, uint16_t nb_pkts, void *_ __rte_unused)
+{
+    printf("tx nb_pkts %u\n",nb_pkts);
+
+    uint64_t now = rte_rdtsc();
+
+    latency_numbers.total_cycles += (now - latency_numbers.g_pkt_timestamp);
+    latency_numbers.total_pkts   += 1;
+
+    if (latency_numbers.total_pkts > (100 * 1000 * 1000ULL)) {
+        printf("Latency = %"PRIu64" cycles\n",
+               latency_numbers.total_cycles / latency_numbers.total_pkts);
+
+        latency_numbers.total_cycles = latency_numbers.total_pkts = 0;
+    }
+
+    return nb_pkts;
+}
+
+static uint16_t
+add_timestamps(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
+               struct rte_mbuf **pkts, uint16_t nb_pkts,uint16_t max_pkts, void *_ __rte_unused)
+{
+    latency_numbers.g_pkt_timestamp = rte_rdtsc();
+
+    printf("rx nb_pkts %u\n",nb_pkts);
+
+    return nb_pkts;
+}
+/*
+ * ==========latency end
+ * */
+
 static int
 init_port_start(void)
 {
@@ -780,6 +825,13 @@ init_port_start(void)
         /* Enable pcap dump */
         if (pconf->pcap) {
             ff_enable_pcap(pconf->pcap);
+        }
+
+        if(ff_global_cfg.dpdk.cal_latency){
+            printf("add latency bench.\n");
+            /* Add the callbacks for RX and TX.*/
+            rte_eth_add_rx_callback(port_id, 0, add_timestamps, NULL);
+            rte_eth_add_tx_callback(port_id, 0, calc_latency, NULL);
         }
     }
 

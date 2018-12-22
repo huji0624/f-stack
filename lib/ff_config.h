@@ -105,6 +105,7 @@ struct ff_config {
         int numa_on;
         int tso;
         int vlan_strip;
+        int cal_latency;
 
         /* sleep x microseconds when no pkts incomming */
         unsigned idle_sleep;
