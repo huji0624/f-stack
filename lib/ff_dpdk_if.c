@@ -598,7 +598,7 @@ static uint16_t
 calc_latency(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
              struct rte_mbuf **pkts, uint16_t nb_pkts, void *_ __rte_unused)
 {
-    printf("tx nb_pkts %u\n",nb_pkts);
+    //printf("tx nb_pkts %u\n",nb_pkts);
 
     uint64_t now = rte_rdtsc();
 
@@ -611,6 +611,7 @@ calc_latency(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
         printf("Latency = %"PRIu64" cycles.  %"PRIu64" ns.\n",perhz,1000*1000*1000*perhz/hz);
 
         latency_numbers.total_cycles = latency_numbers.total_pkts = 0;
+        exit(0);
     }
 
     return nb_pkts;
@@ -623,7 +624,7 @@ add_timestamps(uint16_t port __rte_unused, uint16_t qidx __rte_unused,
     latency_numbers.g_pkt_timestamp = rte_rdtsc();
 
     if(nb_pkts>0){
-        printf("rx nb_pkts %u\n",nb_pkts);
+        //printf("rx nb_pkts %u\n",nb_pkts);
     }
 
     return nb_pkts;
